@@ -3,7 +3,6 @@ from tensorflow.python.keras import activations, initializers, regularizers, con
 from tensorflow.python.util.tf_export import keras_export
 from tensorflow.python.ops.gen_math_ops import mul, mat_mul
 from tensorflow.python.ops.linalg.linalg import svd, transpose
-
 """
 
 Implementation of a Spectral + SVD layer that can learn eigenvalues of the associated adjacency matrix and of its SVD.
