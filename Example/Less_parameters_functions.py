@@ -132,7 +132,7 @@ def train_model(config):
                                                   min_delta=0.005,
                                                   mode='max',
                                                   patience=8)
-    print('\nStart model.fit, n = {}, layer type = {} \n'.format(config['n2'], config['type']))
+    print('\nStart model.fit, n = {}, layer type = {}'.format(config['n2'], config['type']))
     model.fit(flat_train,
               y_train,
               epochs=config['epochs'],
@@ -148,5 +148,5 @@ def train_model(config):
 
     with open(name, "ab") as f:
         pk.dump(outcome[1], f)
-    print('\nResults saved in:\n {}\n'.format(name))
+    print('\nResults saved in:\n {}'.format(name))
     return model
