@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 import pickle as pk
 import os
+from SSVD_layer import SSVD
 
 """
 
@@ -131,7 +132,7 @@ def train_model(config):
                                                   min_delta=0.005,
                                                   mode='max',
                                                   patience=8)
-
+    print('Start model.fit, n = {}, layer type = {} \n'.format(config['n2'], config['type']))
     model.fit(flat_train,
               y_train,
               epochs=config['epochs'],
@@ -147,4 +148,5 @@ def train_model(config):
 
     with open(name, "ab") as f:
         pk.dump(outcome[1], f)
+    print('Results saved in:\n {}\n'.format(name))
     return model
