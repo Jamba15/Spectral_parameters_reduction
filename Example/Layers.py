@@ -4,9 +4,11 @@ from tensorflow.python.keras.layers import Dense
 from tensorflow.python.util.tf_export import keras_export
 from tensorflow.python.ops.gen_math_ops import mul, mat_mul
 from tensorflow.python.ops.linalg.linalg import svd, transpose, qr
-from tensorflow.python.keras.layers.ops.core import dense as dense_action
+from tensorflow.python.keras.layers.core import Dense as dense_action
 from tensorflow import reshape, where, abs, function
 import tensorflow_probability as tfp
+from tensorflow.keras.initializers import Initializer
+
 
 """
 
@@ -22,7 +24,7 @@ def sparsify(x, c):
     return where(abs(x) > c, x, 0)
 
 
-class MatrixInitializer(initializers.Initializer):
+class MatrixInitializer(Initializer):
 
     def __init__(self, matrix):
         self.matrix = matrix
@@ -496,7 +498,6 @@ class QR_sparse(Layer):
 
     def call(self, inputs, **kwargs):
 
-        # phi = mat_mul(self.r, self.q)  # QR trasposto
         phi = mul(self.eig_in - self.eig_out, mat_mul(self.r, self.q))
 
         if self.dynamic_sparse:
