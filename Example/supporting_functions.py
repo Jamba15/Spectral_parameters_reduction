@@ -3,6 +3,7 @@ import numpy as np
 import pickle as pk
 import os
 from SSVD_layer import SSVD
+from QR_layer import QR
 
 """
 
@@ -47,6 +48,20 @@ def SSVD_full_conf(units=1000,
             'use_bias': use_bias,
             'eig_in_initializer': 'zeros',
             'eig_out_initializer': 'ones'
+            }
+
+
+def QR_conf(units=1000,
+            activation='relu',
+            is_eig_in_trainable=True,
+            is_eig_out_trainable=True,
+            use_bias=True
+            ):
+    return {'units': units,
+            'activation': activation,
+            'is_eig_in_trainable': is_eig_in_trainable,
+            'is_eig_out_trainable': is_eig_out_trainable,
+            'use_bias': use_bias
             }
 
 
@@ -105,6 +120,14 @@ def build_model(config):
         hid_parameters = SSVD_full_conf(units=config['n2'])
         last_parameters = SSVD_full_conf(units=10, activation='softmax')
 
+    elif config['type'] == 'QR':
+        hid_parameters = QR_conf(units=config['n2'])
+        last_parameters = QR_conf(units=10, activation='softmax')
+        for i in range(config['hidden_layers']):
+            model.add(QR(**hid_parameters, density=config['density']))
+        model.add(QR(**last_parameters, density=config['density']))
+        return model
+
     for i in range(config['hidden_layers']):
         model.add(SSVD(**hid_parameters))
     model.add(SSVD(**last_parameters))
@@ -116,12 +139,21 @@ def train_model(config):
     (flat_train, y_train), (flat_test, y_test) = load_dataset(config)
     model = build_model(config)
 
-    if config['type'] == 'Dense' and config['dataset'] == 'F-MNIST':
-        lr = 0.001
-    elif config['type'] == 'Dense' and config['dataset'] == 'CIFAR10':
-        lr = 0.002
+    if config['type'] == 'Dense':
+        if config['dataset'] == 'F-MNIST':
+            lr = 0.001
+        elif config['dataset'].find('CIFAR') != -1:
+            lr = 0.002
     else:
         lr = config['learning_rate']
+
+    if config['type'] == 'QR':
+        if config['dataset'].find('CIFAR') != -1:
+            lr = 0.003
+        elif config['dataset'] == 'F-MNIST':
+            lr = 0.001
+        elif config['dataset'] == 'MNIST':
+            lr = 0.005
 
     model.compile(optimizer=tf.keras.optimizers.Adamax(learning_rate=lr),
                   loss='sparse_categorical_crossentropy',
