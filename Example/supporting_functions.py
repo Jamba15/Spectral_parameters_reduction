@@ -2,14 +2,7 @@ import tensorflow as tf
 import numpy as np
 import pickle as pk
 import os
-from SSVD_layer import SSVD
-from QR_layer import QR
-
-"""
-
-Supporting Functions
-
-"""
+from Layers import SSVD, QR
 
 
 def Spec_full_conf(units=1000,
@@ -57,6 +50,10 @@ def QR_conf(units=1000,
             is_eig_out_trainable=True,
             use_bias=True
             ):
+    """
+    :return: configuration for the QR layer
+    :rtype: dict
+    """
     return {'units': units,
             'activation': activation,
             'is_eig_in_trainable': is_eig_in_trainable,
