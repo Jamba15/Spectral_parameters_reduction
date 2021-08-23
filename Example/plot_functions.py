@@ -18,8 +18,23 @@ def load_results(nlist, ris_folder, lay_type):
         ris.append([tmp.mean(axis=0), tmp.var(axis=0)])
     return ris
 
-def plot_results(n, ris_folder):
 
+def load_results_sparse(perc, ris_folder, lay_type):
+    ris = []
+    for p in perc:
+        tmp = []
+        with open(join(ris_folder, lay_type + '_' + str(p) + '.p'), 'rb') as f:
+            while True:
+                try:
+                    tmp.append(pickle.load(f))
+                except EOFError:
+                    break
+            tmp = np.array(tmp)
+        ris.append([tmp.mean(axis=0), tmp.var(axis=0)])
+    return ris
+
+
+def plot_results(n, ris_folder):
     Dense = load_results(nlist=n, ris_folder=ris_folder, lay_type='Dense')
     SpecFull = load_results(nlist=n, ris_folder=ris_folder, lay_type='Spectral_full')
     QR = load_results(nlist=n, ris_folder=ris_folder, lay_type='QR')
@@ -126,7 +141,6 @@ def plot_results(n, ris_folder):
     n = np.array(n)
     ax[1].plot(n, rhoSSVD[[list(n - 1)]], color=col[4], marker='o', markersize=ms1, linestyle='none')
     ax[1].plot(n, rhoQR[[list(n - 1)]], color=col[5], marker='o', markersize=ms1, linestyle='none')
-    # ax[1].plot(n,rhoSp[[list(n-1)]],color=col[1], marker='o', markersize=ms1, linestyle='none')
     ax[1].plot(n, rhoSpCompl[[list(n - 1)]], color=col[3], marker='o', markersize=ms1, linestyle='none')
     ax[1].set_ylabel(r'$\rho$', fontsize=f, rotation=0, labelpad=20)
 
@@ -138,5 +152,49 @@ def plot_results(n, ris_folder):
     ax[1].set_xscale('log')
     plt.tight_layout()
 
-    # plt.savefig('FigureArticolo/RelAcc_ML_Fm')
+    plt.show()
+
+
+def res_plot_sparse(percentiles, ris_folder):
+    p = np.array(percentiles)
+
+    Dense = load_results_sparse(perc=percentiles,
+                                ris_folder=ris_folder,
+                                lay_type='Dense')
+    QR = load_results_sparse(perc=percentiles,
+                             ris_folder=ris_folder,
+                             lay_type='QR_sparse')
+
+    Dense_acc = []
+    Dense_err = []
+    QR_acc = []
+    QR_err = []
+
+    for i in range(len(p)):
+        Dense_acc.append(Dense[i][0])
+        Dense_err.append(Dense[i][1])
+        QR_acc.append(QR[i][0])
+        QR_err.append(QR[i][1])
+    Dense_acc = np.array(Dense_acc)
+    Dense_err = np.array(Dense_err)
+    QR_acc = np.array(QR_acc)
+    QR_err = np.array(QR_err)
+
+    plt.rcParams.update({'font.size': 23})
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+
+    fig, ax = plt.subplots(1, 1, figsize=(10, 12))
+
+    ax.plot(p, Dense_acc, color='k', marker='d')
+    ax.fill_between(p, list(Dense_acc + Dense_err), list(Dense_acc - Dense_err), color='k', alpha=0.3)
+    ax.plot(p, QR_acc, color='tab:red', marker='p')
+    ax.fill_between(p, list(QR_acc + QR_err), list(QR_acc - QR_err), color='tab:red', alpha=0.3)
+
+    ax.set_xlim([0.75, 1.0])
+
+    ax.set_ylabel(r'Accuracy', fontsize=25, rotation=90, labelpad=15)
+    ax.set_xlabel(r'Sparsity', fontsize=25, rotation=0, labelpad=15)
+    plt.tight_layout()
+
     plt.show()

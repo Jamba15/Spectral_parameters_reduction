@@ -121,7 +121,7 @@ def sparse_training(configur):
 
     # Dynamic sparse
     n = configur['type'] + '_' + str(configur[
-                                         'percentile'])
+                                         'percentile']) + '.p'
     name = join(folder, n)
 
     with open(name, "ab") as f:
