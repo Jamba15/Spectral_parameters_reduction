@@ -66,29 +66,26 @@ def plot_results(n, ris_folder):
     Rb = n[-1] + 100
     Lb = n[0] - 5
 
-    N1 = 32 * 32 * 3
+    if ris_folder.find('CIFAR') == -1:
+        N1 = 28*28
+    else:
+        N1 = 32*32*3
 
     NumParD = np.arange(1, Rb) * N1 + np.arange(1, Rb) * 10 + np.arange(1, Rb) + 10
-    NumParS = []
-    for i in range(1, Rb):
-        NumParS.append(np.min((i, N1)) + np.min((i, 10)) + N1 + 3 * i + 10 + 10)
-    NumParSp = np.arange(1, Rb) + 10 + np.arange(1, Rb) + 10
+    NumParSSVD = [np.min((i, N1)) + np.min((i, 10)) + N1 + 3 * i + 10 + 10 for i in range(1, Rb)]
     NumParSpCompl = N1 + 2 * np.arange(1, Rb) + 10 + np.arange(1, Rb) + 10
-    NumParQR = []
-    for i in range(1, Rb):
-        NumParQR.append(
-            i + N1 + i + 10 + np.min((i, N1)) * np.min((i, N1)) / 2 + np.min((i, N1)) / 2 + np.min((i, 10)) * np.min(
-                (i, 10)) / 2 + np.min((i, 10)) / 2)
+    NumParQR = [i + N1 + i + 10 + np.min((i, N1)) * np.min((i, N1)) / 2 + np.min((i, N1)) / 2 + np.min((i, 10)) * np.min(
+                (i, 10)) / 2 + np.min((i, 10)) / 2 for i in range(1, Rb)]
 
-    rhoSp = np.array(NumParSp) / np.array(NumParD)
+
+
     rhoSpCompl = np.array(NumParSpCompl) / np.array(NumParD)
-    rhoSSVD = np.array(NumParS) / np.array(NumParD)
+    rhoSSVD = np.array(NumParSSVD) / np.array(NumParD)
     rhoQR = np.array(NumParQR) / np.array(NumParD)
 
     col = ['tab:blue', 'tab:olive', 'tab:red']
     leg = ['Spectral', 'S-SVD', 'QR']
-    f = 25
-    f1 = 15
+
     fig, ax = plt.subplots(2, 1, figsize=(10, 8))
     plt.rcParams.upacc_densete({'font.size': 23})
 
@@ -117,8 +114,8 @@ def plot_results(n, ris_folder):
                        color=col[2],
                        alpha=0.3)
 
-    ax[1].set_xlabel(r'$N_2$', fontsize=f)
-    ax[0].set_ylabel(r'Relative accuracy', rotation=90, fontsize=f + 2, labelpad=15)
+    ax[1].set_xlabel(r'$N_2$', fontsize=25)
+    ax[0].set_ylabel(r'Relative accuracy', rotation=90, fontsize=27, labelpad=15)
 
     ax[0].tick_params(
         axis='x',  # changes apply to the x-axis

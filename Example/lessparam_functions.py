@@ -141,16 +141,17 @@ def train_model(config):
             lr = 0.001
         elif config['dataset'].find('CIFAR') != -1:
             lr = 0.002
-    else:
-        lr = config['learning_rate']
-
-    if config['type'] == 'QR':
+        else:
+            lr = config['learning_rate']
+    elif config['type'] == 'QR':
         if config['dataset'].find('CIFAR') != -1:
             lr = 0.003
         elif config['dataset'] == 'F-MNIST':
             lr = 0.001
         elif config['dataset'] == 'MNIST':
             lr = 0.005
+    else:
+        lr = config['learning_rate']
 
     model.compile(optimizer=tf.keras.optimizers.Adamax(learning_rate=lr),
                   loss='sparse_categorical_crossentropy',
